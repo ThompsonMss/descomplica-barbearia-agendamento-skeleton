@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
+import { format, getDay } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -56,6 +56,15 @@ export function Appointment() {
   const [servico, setServico] = useState("");
   const [data, setData] = useState<Date | undefined>(new Date());
   const [horario, setHorario] = useState("");
+  const [loadHorario, setLoadHorario] = useState(true);
+
+  const eDomingo = React.useMemo(() => {
+    if (data) {
+      return getDay(data) === 0;
+    }
+
+    return false;
+  }, [data]);
 
   return (
     <section id="agendamento">
@@ -114,6 +123,7 @@ export function Appointment() {
                   name="servico"
                   id="servico"
                   value={servico}
+                  defaultValue={""}
                   onChange={(e) => setServico(e.target.value)}
                 >
                   <option disabled selected value="">
@@ -163,50 +173,85 @@ export function Appointment() {
                 </Popover>
               </div>
 
-              <div className="grp-input">
-                <label
-                  htmlFor="servico"
-                  style={{ fontSize: 14, marginBottom: 4 }}
-                >
-                  Horário:
-                </label>
-                <select
-                  className="input"
-                  style={{ width: "100%" }} //20px
-                  name="horario"
-                  id="horario"
-                  value={horario}
-                  onChange={(e) => {
-                    if (!data) {
-                      alert("Por favor, selecione uma data primeiro.");
-                    } else {
-                      setHorario(e.target.value);
-                    }
-                  }}
-                >
-                  <option disabled selected value="">
-                    Selecione
-                  </option>
-                  <option value="Corte">10:00</option>
-                  <option value="Corte">10:30</option>
-                  <option value="Corte">11:00</option>
-                  <option value="Corte">11:30</option>
-                  <option value="Corte">12:00</option>
-                  <option value="Corte">13:30</option>
-                  <option value="Corte">14:00</option>
-                  <option value="Corte">14:30</option>
-                  <option value="Corte">15:00</option>
-                  <option value="Corte">15:30</option>
-                  <option value="Corte">16:00</option>
-                  <option value="Corte">16:30</option>
-                  <option value="Corte">17:00</option>
-                  <option value="Corte">17:30</option>
-                  <option value="Corte">18:00</option>
-                  <option value="Corte">18:30</option>
-                  <option value="Corte">19:00</option>
-                  <option value="Corte">19:30</option>
-                </select>
-              </div>
+              {!!data ? (
+                <>
+                  {loadHorario ? (
+                    <div className="grp-input">
+                      <label
+                        htmlFor="servico"
+                        style={{ fontSize: 14, marginBottom: 4 }}
+                      >
+                        Horário:
+                      </label>
+
+                      <input
+                        className="input"
+                        style={{ width: "auto" }} // 30px
+                        type="text"
+                        placeholder="Carregando..."
+                      />
+                    </div>
+                  ) : (
+                    <div className="grp-input">
+                      <label
+                        htmlFor="servico"
+                        style={{ fontSize: 14, marginBottom: 4 }}
+                      >
+                        Horário:
+                      </label>
+                      <select
+                        disabled={!data}
+                        className="input"
+                        defaultValue={""}
+                        style={
+                          !data
+                            ? { background: "#CCC", width: "100%" }
+                            : { width: "100%" }
+                        } //20px
+                        name="horario"
+                        id="horario"
+                        value={horario}
+                        onChange={(e) => {
+                          if (!data) {
+                            alert("Por favor, selecione uma data primeiro.");
+                          } else {
+                            setHorario(e.target.value);
+                          }
+                        }}
+                      >
+                        <option disabled selected value="">
+                          Selecione
+                        </option>
+                        <option value="Corte">10:00</option>
+                        <option value="Corte">10:30</option>
+                        <option value="Corte">11:00</option>
+                        <option value="Corte">11:30</option>
+                        <option value="Corte">12:00</option>
+
+                        {!eDomingo && (
+                          <>
+                            <option value="Corte">13:30</option>
+                            <option value="Corte">14:00</option>
+                            <option value="Corte">14:30</option>
+                            <option value="Corte">15:00</option>
+                            <option value="Corte">15:30</option>
+                            <option value="Corte">16:00</option>
+                            <option value="Corte">16:30</option>
+                            <option value="Corte">17:00</option>
+                            <option value="Corte">17:30</option>
+                            <option value="Corte">18:00</option>
+                            <option value="Corte">18:30</option>
+                            <option value="Corte">19:00</option>
+                            <option value="Corte">19:30</option>
+                          </>
+                        )}
+                      </select>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="grp-input"></div>
+              )}
             </div>
 
             <button

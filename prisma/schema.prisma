@@ -25,7 +25,7 @@ model User {
   excluded_at   DateTime?
 }
 
-model Cliente {
+model Appointment {
   id           Int @id @default(autoincrement())
   client_name  String  @db.VarChar(255)
   ddd_phone    Int

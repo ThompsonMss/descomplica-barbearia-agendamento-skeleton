@@ -12,7 +12,7 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
-CREATE TABLE "Cliente" (
+CREATE TABLE "Appointment" (
     "id" SERIAL NOT NULL,
     "client_name" VARCHAR(255) NOT NULL,
     "ddd_phone" INTEGER NOT NULL,
@@ -25,5 +25,5 @@ CREATE TABLE "Cliente" (
     "updated_at" TIMESTAMP(3),
     "excluded_at" TIMESTAMP(3),
 
-    CONSTRAINT "Cliente_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Appointment_pkey" PRIMARY KEY ("id")
 );

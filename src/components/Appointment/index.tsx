@@ -189,6 +189,7 @@ export function Appointment() {
                         style={{ width: "auto" }} // 30px
                         type="text"
                         placeholder="Carregando..."
+                        disabled
                       />
                     </div>
                   ) : (

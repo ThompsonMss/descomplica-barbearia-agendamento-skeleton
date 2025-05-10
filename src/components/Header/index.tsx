@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Logo from "../../../assets/logo.png";
+import Logo from "../../assets/logo.png";
 
 export function Header() {
   function marcando(classe: string) {

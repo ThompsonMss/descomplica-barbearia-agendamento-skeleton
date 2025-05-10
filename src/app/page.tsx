@@ -1,6 +1,6 @@
-import { Header } from "./components/Header";
-import { NavMobile } from "./components/NavMobile";
-import { Appointment } from "./components/Appointment";
+import { Header } from "../components/Header";
+import { NavMobile } from "../components/NavMobile";
+import { Appointment } from "../components/Appointment";
 
 import Image from "next/image";
 

@@ -30,6 +30,9 @@ export async function ListAppointment({ date }: { date: string }) {
           lte: endOfDay(dataCurrent),
         },
       },
+      orderBy: {
+        hour: "asc"
+      }
     });
   } catch (error) {
     hasError = true;
@@ -80,7 +83,7 @@ export async function ListAppointment({ date }: { date: string }) {
                 {itemData.client_name}
               </TableCell>
               <TableCell className="text-base text-zinc-800">
-                {format(itemData.date, "dd/MM/yyyy")} {itemData.hour}
+                {itemData.hour}
               </TableCell>
 
               <TableCell

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format, getDay } from "date-fns";
+import { format, getDay, parseISO } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -15,6 +15,10 @@ import {
 import { ptBR } from "date-fns/locale";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import { createAppoitment } from "@/services/appointment/createAppoitment";
+
+import { EnumStatusAppointment } from "@/enum/EnumStatusAppointment";
 
 function setMaskAllPhone(value: string): string {
   const cleanedValue = value.replace(/\D/g, "");
@@ -58,6 +62,8 @@ export function Appointment() {
   const [horario, setHorario] = useState("");
   const [loadHorario, setLoadHorario] = useState(true);
 
+  const [horariosBlock, setHorariosBlock] = useState<{ hour: string }[]>([]);
+
   const eDomingo = React.useMemo(() => {
     if (data) {
       return getDay(data) === 0;
@@ -65,6 +71,123 @@ export function Appointment() {
 
     return false;
   }, [data]);
+
+  React.useEffect(() => {
+    if (!data) return;
+
+    // Buscar horários quando a data for selecionada
+    const fetchHorarios = async () => {
+      try {
+        setLoadHorario(true);
+
+        const response = await fetch(
+          `/api/horario?date=${format(data, "yyyy-MM-dd")}`
+        );
+
+        const dataReq = await response.json();
+
+        if (response.ok) {
+          setHorariosBlock(dataReq);
+        } else {
+          setHorariosBlock([]);
+        }
+      } catch (error) {
+        console.error("Erro ao fazer a requisição", error);
+        setHorariosBlock([]);
+      } finally {
+        setLoadHorario(false);
+      }
+    };
+
+    fetchHorarios();
+  }, [data]);
+
+  const [loading, setLoading] = useState(false);
+
+  function onSubmit() {
+    setLoading(true);
+
+    // Validacoes
+    if (!nome) {
+      setLoading(false);
+      return alert("Por favor, preencha seu nome.");
+    }
+
+    if (!telefone) {
+      setLoading(false);
+      return alert("Por favor, preencha seu telefone.");
+    } else {
+      if (telefone.length < 14) {
+        setLoading(false);
+        return alert("Por favor, preencha um telefone válido.");
+      }
+    }
+
+    if (!servico) {
+      setLoading(false);
+      return alert("Por favor, selecione um serviço.");
+    }
+
+    if (!data) {
+      setLoading(false);
+      return alert("Por favor, preencha uma data.");
+    }
+
+    if (!horario) {
+      setLoading(false);
+      return alert("Por favor, preencha um horário.");
+    }
+
+    React.startTransition(async () => {
+      try {
+        const phone = removePhoneMask(telefone);
+
+        const dataInsert: any = {
+          client_name: nome,
+          date: data
+            ? parseISO(`${format(data, "yyyy-MM-dd")}T15:00:00.000Z`)
+            : new Date(),
+          hour: horario,
+          ddd_phone: Number(phone.slice(0, 2)),
+          phone: Number(phone.slice(2)),
+          service: servico,
+          status: EnumStatusAppointment.PENDING,
+        };
+
+        await createAppoitment(dataInsert);
+
+        //Repopulando horários
+        const dateQuery = data
+          ? parseISO(`${format(data, "yyyy-MM-dd")}T15:00:00.000Z`)
+          : new Date();
+
+        const response = await fetch(
+          `/api/horario?date=${format(dateQuery, "yyyy-MM-dd")}`
+        );
+
+        const dataReq = await response.json();
+
+        if (response.ok) {
+          setHorariosBlock(dataReq);
+        } else {
+          setHorariosBlock([]);
+        }
+
+        //Limpando
+        setNome("");
+        setTelefone("");
+        setServico("");
+        setData(new Date());
+        setHorario("");
+
+        alert("Agendamento salvo com sucesso.");
+      } catch (error: any) {
+        alert(`Erro ao salvar Agendamento. ${error?.message}`);
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
 
   return (
     <section id="agendamento">
@@ -165,7 +288,10 @@ export function Appointment() {
                     <Calendar
                       mode="single"
                       selected={data}
-                      onSelect={(date) => setData(date)}
+                      onSelect={(date) => {
+                        setData(date);
+                        setHorario("");
+                      }}
                       initialFocus
                       locale={ptBR}
                     />
@@ -223,27 +349,189 @@ export function Appointment() {
                         <option disabled selected value="">
                           Selecione
                         </option>
-                        <option value="Corte">10:00</option>
-                        <option value="Corte">10:30</option>
-                        <option value="Corte">11:00</option>
-                        <option value="Corte">11:30</option>
-                        <option value="Corte">12:00</option>
+                        <option
+                          value="10:00:00"
+                          disabled={
+                            !!horariosBlock.find((h) => {
+                              return h.hour === "10:00:00";
+                            })
+                          }
+                        >
+                          10:00
+                        </option>
+                        <option
+                          value="10:30:00"
+                          disabled={
+                            !!horariosBlock.find((h) => {
+                              return h.hour === "10:30:00";
+                            })
+                          }
+                        >
+                          10:30
+                        </option>
+                        <option
+                          value="11:00:00"
+                          disabled={
+                            !!horariosBlock.find((h) => {
+                              return h.hour === "11:00:00";
+                            })
+                          }
+                        >
+                          11:00
+                        </option>
+                        <option
+                          value="11:30:00"
+                          disabled={
+                            !!horariosBlock.find((h) => {
+                              return h.hour === "11:30:00";
+                            })
+                          }
+                        >
+                          11:30
+                        </option>
+                        <option
+                          value="12:00:00"
+                          disabled={
+                            !!horariosBlock.find((h) => {
+                              return h.hour === "12:00:00";
+                            })
+                          }
+                        >
+                          12:00
+                        </option>
 
                         {!eDomingo && (
                           <>
-                            <option value="Corte">13:30</option>
-                            <option value="Corte">14:00</option>
-                            <option value="Corte">14:30</option>
-                            <option value="Corte">15:00</option>
-                            <option value="Corte">15:30</option>
-                            <option value="Corte">16:00</option>
-                            <option value="Corte">16:30</option>
-                            <option value="Corte">17:00</option>
-                            <option value="Corte">17:30</option>
-                            <option value="Corte">18:00</option>
-                            <option value="Corte">18:30</option>
-                            <option value="Corte">19:00</option>
-                            <option value="Corte">19:30</option>
+                            <option
+                              value="13:30:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "13:30:00";
+                                })
+                              }
+                            >
+                              13:30
+                            </option>
+                            <option
+                              value="14:00:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "14:00:00";
+                                })
+                              }
+                            >
+                              14:00
+                            </option>
+                            <option
+                              value="14:30:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "14:30:00";
+                                })
+                              }
+                            >
+                              14:30
+                            </option>
+                            <option
+                              value="15:00:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "15:00:00";
+                                })
+                              }
+                            >
+                              15:00
+                            </option>
+                            <option
+                              value="15:30:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "15:30:00";
+                                })
+                              }
+                            >
+                              15:30
+                            </option>
+                            <option
+                              value="16:00:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "16:00:00";
+                                })
+                              }
+                            >
+                              16:00
+                            </option>
+                            <option
+                              value="16:30:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "16:30:00";
+                                })
+                              }
+                            >
+                              16:30
+                            </option>
+                            <option
+                              value="17:00:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "17:00:00";
+                                })
+                              }
+                            >
+                              17:00
+                            </option>
+                            <option
+                              value="17:30:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "17:30:00";
+                                })
+                              }
+                            >
+                              17:30
+                            </option>
+                            <option
+                              value="18:00:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "18:00:00";
+                                })
+                              }
+                            >
+                              18:00
+                            </option>
+                            <option
+                              value="18:30:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "18:30:00";
+                                })
+                              }
+                            >
+                              18:30
+                            </option>
+                            <option
+                              value="19:00:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "19:00:00";
+                                })
+                              }
+                            >
+                              19:00
+                            </option>
+                            <option
+                              value="19:30:00"
+                              disabled={
+                                !!horariosBlock.find((h) => {
+                                  return h.hour === "19:30:00";
+                                })
+                              }
+                            >
+                              19:30
+                            </option>
                           </>
                         )}
                       </select>
@@ -256,13 +544,11 @@ export function Appointment() {
             </div>
 
             <button
-              onClick={() => {
-                //submitWpp
-              }}
+              onClick={onSubmit}
               className="btn-agendamento"
               style={{ marginTop: 20 }}
             >
-              Agendar
+              {loading ? "Enviando" : "Agendar"}
             </button>
           </div>
         </div>

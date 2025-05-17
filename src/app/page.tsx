@@ -4,7 +4,7 @@ import { Appointment } from "../components/Appointment";
 
 import Image from "next/image";
 
-import ImgSobre from "../assets/sobre.jpeg";
+import ImgSobre from "../assets/sobre.jpg";
 import Logo from "../assets/logo.png";
 import ImgScissors from "../assets/scissors.png";
 import ImgNavalha from "../assets/navalha.png";

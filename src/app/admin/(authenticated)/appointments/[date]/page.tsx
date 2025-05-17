@@ -14,7 +14,7 @@ import { ListAppointment } from "./components/listAppointment";
 export default async function Appointments({
   params,
 }: {
-  params: { date: string };
+  params: any;
 }) {
   const session = await getServerSession(authOptions as any);
 

@@ -119,7 +119,13 @@ export default function Home() {
       <footer id="contato">
         <div className="content">
           <div className="footer-top">
-            <Image src={Logo} width={120} height={200} alt="Logotipo" />
+            <Image
+              src={Logo}
+              width={120}
+              height={200}
+              alt="Logotipo"
+              style={{ borderRadius: 12 }}
+            />
 
             <a
               href="https://www.instagram.com/barbeariadomarciosantos/"

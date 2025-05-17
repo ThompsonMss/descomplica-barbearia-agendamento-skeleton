@@ -30,7 +30,13 @@ export function Header() {
     <header id="header">
       <div className="content-header">
         <div className="logo">
-          <Image src={Logo} width={150} height={200} alt="Logotipo" />
+          <Image
+            src={Logo}
+            width={150}
+            height={200}
+            alt="Logotipo"
+            style={{ borderRadius: 12 }}
+          />
         </div>
 
         <nav className="nav-desk">

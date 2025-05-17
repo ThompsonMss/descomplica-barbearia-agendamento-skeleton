@@ -32,9 +32,14 @@ export function Header(props: HeaderProps) {
         </button>
 
         <Link href={"/dashboard"}>
-          <Image src={LogoSVG} width={50} height={50} alt="Logotipo" />
+          <Image
+            src={LogoSVG}
+            width={50}
+            height={50}
+            alt="Logotipo"
+            style={{ borderRadius: 6 }}
+          />
         </Link>
-        
       </div>
 
       <span className="text-base text-zinc-800">Olá, {data?.user?.name}</span>

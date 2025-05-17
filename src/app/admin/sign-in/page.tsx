@@ -75,7 +75,13 @@ export default function SignIn() {
 
   return (
     <main className="w-full h-screen flex flex-col items-center justify-center px-8 gap-8">
-      <Image src={LogoSVG} width={160} height={160} alt="Logotipo" />
+      <Image
+        src={LogoSVG}
+        width={160}
+        height={160}
+        alt="Logotipo"
+        style={{ borderRadius: 12 }}
+      />
 
       <form
         onSubmit={handleSubmit(onSubmit)}

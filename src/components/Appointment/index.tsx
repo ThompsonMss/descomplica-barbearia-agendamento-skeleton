@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format, getDay, parseISO } from "date-fns";
+import { format, getDay, isBefore, parseISO, startOfDay } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -189,6 +189,23 @@ export function Appointment() {
     });
   }
 
+  function isHorarioPassado(horario: string): boolean {
+    if (!data) return false;
+
+    const hoje = startOfDay(new Date());
+    const dataSelecionada = startOfDay(data);
+
+    // Só bloqueia horários passados se a data for hoje
+    if (hoje.getTime() !== dataSelecionada.getTime()) return false;
+
+    const agora = new Date();
+    const [hora, minuto, segundo] = horario.split(":").map(Number);
+    const horarioSelecionado = new Date(data);
+    horarioSelecionado.setHours(hora, minuto, segundo, 0);
+
+    return horarioSelecionado <= agora;
+  }
+
   return (
     <section id="agendamento">
       <div className="content">
@@ -294,6 +311,9 @@ export function Appointment() {
                       }}
                       initialFocus
                       locale={ptBR}
+                      disabled={(date) =>
+                        isBefore(startOfDay(date), startOfDay(new Date()))
+                      }
                     />
                   </PopoverContent>
                 </Popover>
@@ -354,8 +374,7 @@ export function Appointment() {
                           disabled={
                             !!horariosBlock.find((h) => {
                               return h.hour === "09:00:00";
-                            }) ||
-                            new Date().toTimeString().slice(0, 8) >= "09:00:00"
+                            }) || isHorarioPassado("09:00:00")
                           }
                         >
                           09:00
@@ -365,8 +384,7 @@ export function Appointment() {
                           disabled={
                             !!horariosBlock.find((h) => {
                               return h.hour === "09:30:00";
-                            }) ||
-                            new Date().toTimeString().slice(0, 8) >= "09:30:00"
+                            }) || isHorarioPassado("09:30:00")
                           }
                         >
                           09:30
@@ -377,8 +395,7 @@ export function Appointment() {
                           disabled={
                             !!horariosBlock.find((h) => {
                               return h.hour === "10:00:00";
-                            }) ||
-                            new Date().toTimeString().slice(0, 8) >= "10:00:00"
+                            }) || isHorarioPassado("10:00:00")
                           }
                         >
                           10:00
@@ -388,8 +405,7 @@ export function Appointment() {
                           disabled={
                             !!horariosBlock.find((h) => {
                               return h.hour === "10:30:00";
-                            }) ||
-                            new Date().toTimeString().slice(0, 8) >= "10:30:00"
+                            }) || isHorarioPassado("10:30:00")
                           }
                         >
                           10:30
@@ -399,8 +415,7 @@ export function Appointment() {
                           disabled={
                             !!horariosBlock.find((h) => {
                               return h.hour === "11:00:00";
-                            }) ||
-                            new Date().toTimeString().slice(0, 8) >= "11:00:00"
+                            }) || isHorarioPassado("11:00:00")
                           }
                         >
                           11:00
@@ -410,8 +425,7 @@ export function Appointment() {
                           disabled={
                             !!horariosBlock.find((h) => {
                               return h.hour === "11:30:00";
-                            }) ||
-                            new Date().toTimeString().slice(0, 8) >= "11:30:00"
+                            }) || isHorarioPassado("11:30:00")
                           }
                         >
                           11:30
@@ -421,8 +435,7 @@ export function Appointment() {
                           disabled={
                             !!horariosBlock.find((h) => {
                               return h.hour === "12:00:00";
-                            }) ||
-                            new Date().toTimeString().slice(0, 8) >= "12:00:00"
+                            }) || isHorarioPassado("12:00:00")
                           }
                         >
                           12:00
@@ -435,9 +448,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "13:30:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "13:30:00"
+                                }) || isHorarioPassado("13:30:00")
                               }
                             >
                               13:30
@@ -447,9 +458,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "14:00:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "14:00:00"
+                                }) || isHorarioPassado("14:00:00")
                               }
                             >
                               14:00
@@ -459,9 +468,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "14:30:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "14:30:00"
+                                }) || isHorarioPassado("14:30:00")
                               }
                             >
                               14:30
@@ -471,9 +478,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "15:00:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "15:00:00"
+                                }) || isHorarioPassado("15:00:00")
                               }
                             >
                               15:00
@@ -483,9 +488,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "15:30:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "15:30:00"
+                                }) || isHorarioPassado("15:30:00")
                               }
                             >
                               15:30
@@ -495,9 +498,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "16:00:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "16:00:00"
+                                }) || isHorarioPassado("16:00:00")
                               }
                             >
                               16:00
@@ -507,9 +508,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "16:30:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "16:30:00"
+                                }) || isHorarioPassado("16:30:00")
                               }
                             >
                               16:30
@@ -519,9 +518,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "17:00:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "17:00:00"
+                                }) || isHorarioPassado("17:00:00")
                               }
                             >
                               17:00
@@ -531,9 +528,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "17:30:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "17:30:00"
+                                }) || isHorarioPassado("17:30:00")
                               }
                             >
                               17:30
@@ -543,9 +538,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "18:00:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "18:00:00"
+                                }) || isHorarioPassado("18:00:00")
                               }
                             >
                               18:00
@@ -555,9 +548,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "18:30:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "18:30:00"
+                                }) || isHorarioPassado("18:30:00")
                               }
                             >
                               18:30
@@ -567,9 +558,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "19:00:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "19:00:00"
+                                }) || isHorarioPassado("19:00:00")
                               }
                             >
                               19:00
@@ -579,9 +568,7 @@ export function Appointment() {
                               disabled={
                                 !!horariosBlock.find((h) => {
                                   return h.hour === "19:30:00";
-                                }) ||
-                                new Date().toTimeString().slice(0, 8) >=
-                                  "19:30:00"
+                                }) || isHorarioPassado("19:30:00")
                               }
                             >
                               19:30
